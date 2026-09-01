@@ -1,0 +1,96 @@
+name: Build Lambda Function
+
+on:
+  push:
+    branches: [master, main]
+    paths:
+      - "lambda-function/**"
+      - ".github/workflows/main.yml"
+  pull_request:
+    paths:
+      - "lambda-function/**"
+      - ".github/workflows/main.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: lambda-function-${{ github.event.pull_request.head.sha || github.sha }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  build:
+    name: Build bootstrap zip
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: lambda-function
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry/index
+            ~/.cargo/registry/cache
+            ~/.cargo/git/db
+            lambda-function/target
+          key: lambda-function-arm64-${{ hashFiles('lambda-function/Cargo.lock', 'lambda-function/Cargo.toml') }}
+          restore-keys: |
+            lambda-function-arm64-
+
+      - name: Install Cargo Lambda
+        run: pipx install cargo-lambda
+
+      - name: Build Lambda bootstrap
+        run: cargo lambda build --release --arm64
+
+      - name: Package bootstrap
+        run: |
+          test -f target/lambda/bootstrap/bootstrap
+          rm -rf dist
+          mkdir dist
+          cp target/lambda/bootstrap/bootstrap dist/bootstrap
+          chmod +x dist/bootstrap
+          cd dist
+          zip -9 ../bootstrap.zip bootstrap
+
+      - name: Verify zip contents
+        run: |
+          unzip -l bootstrap.zip
+          test "$(zipinfo -1 bootstrap.zip)" = "bootstrap"
+
+      - name: Upload bootstrap artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: lambda-bootstrap
+          path: lambda-function/bootstrap.zip
+          if-no-files-found: error
+
+      - name: Configure AWS credentials
+        if: github.event_name != 'pull_request'
+        uses: aws-actions/configure-aws-credentials@v6.2.3
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Deploy Lambda function
+        if: github.event_name != 'pull_request'
+        env:
+          AWS_LAMBDA_FUNCTION_NAME: ${{ vars.AWS_LAMBDA_FUNCTION_NAME }}
+        run: |
+          test -n "$AWS_LAMBDA_FUNCTION_NAME"
+          aws lambda update-function-code \
+            --function-name "$AWS_LAMBDA_FUNCTION_NAME" \
+            --zip-file fileb://bootstrap.zip \
+            --publish
+          aws lambda wait function-updated \
+            --function-name "$AWS_LAMBDA_FUNCTION_NAME"
