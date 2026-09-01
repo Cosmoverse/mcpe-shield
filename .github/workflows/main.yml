@@ -50,6 +50,9 @@ jobs:
       - name: Install Cargo Lambda
         run: pipx install cargo-lambda
 
+      - name: Install Zig
+        run: npm install -g @ziglang/cli
+
       - name: Build Lambda bootstrap
         run: cargo lambda build --release --arm64
 
