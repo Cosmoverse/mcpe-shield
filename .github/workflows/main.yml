@@ -84,6 +84,7 @@ jobs:
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: ${{ vars.AWS_REGION }}
+          audience: sts.amazonaws.com
 
       - name: Deploy Lambda function
         if: github.event_name != 'pull_request'
