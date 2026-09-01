@@ -3,7 +3,7 @@
 </div>
 <div align="center">
   <a href="https://mcpe-shield-ui.cosmicpe.dev"><img src="https://img.shields.io/badge/Demo_site-mcpe&hyphen;shield&hyphen;ui.cosmicpe.dev-blue" alt="License"/></a>
-  <a href="https://github.com/Cosmoverse/mcpe-shield/blob/master/LICENSE"><img src="https://img.shields.io/github/license/Cosmoverse/mcpe-shield?v=1" alt="License"/></a>
+  <a href="https://github.com/Cosmoverse/mcpe-shield/blob/master/LICENSE"><img src="https://img.shields.io/github/license/Cosmoverse/mcpe-shield?v=2" alt="License"/></a>
 </div>
 <p align="center">
   Shields.io-compatible badges for your Minecraft: Bedrock Edition server.
