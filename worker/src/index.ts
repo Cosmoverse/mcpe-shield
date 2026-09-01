@@ -9,7 +9,9 @@ export default {
 		let data
 		try{
 			const udp = new URL(`udp://${target}`)
-			const response = await fetch(env.LAMBDA_URL, { method: "POST", body: `${udp.hostname}:${udp.port || 19132}` })
+			const response = await fetch(`${env.LAMBDA_URL}/${udp.hostname}:${udp.port || 19132}`, {
+				cf: {cacheEverything: true, cacheTtl: 180}
+			})
 			if(!response.ok) throw Error("Failed to fetch")
 			data = await response.bytes()
 		}catch{
