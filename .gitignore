@@ -1,0 +1,7 @@
+lambda-function/target/
+pages/.astro/
+pages/dist/
+pages/node_modules/
+pages/pnpm-workspace.yaml
+worker/node_modules/
+worker/pnpm-workspace.yaml
