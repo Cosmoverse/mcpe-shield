@@ -6,5 +6,8 @@
 	"observability": {
 		"enabled": true
 	},
-	"keep_vars": true
+	"keep_vars": true,
+	"secrets": {
+		"required": ["LAMBDA_URL"]
+	}
 }
