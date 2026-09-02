@@ -1,8 +1,11 @@
 ---
-import { Badge, Clipboard, Eye, RefreshCw, Server, Sparkles } from '@lucide/astro';
+import { Clipboard, Eye, RefreshCw, Server } from '@lucide/astro';
+import '../styles/global.css';
+
+const placeholders = ['edition', 'motd', 'protocol', 'version', 'players', 'maxPlayers', 'serverId', 'subMotd', 'gamemode', 'gamemodeId', 'portIpv4', 'portIpv6'];
 ---
 
-<html lang="en">
+<html lang="en" data-theme="light">
   <head>
     <meta charset="utf-8" />
     <link rel="icon" href="https://static.cosmicpe.me/logo.svg" />
@@ -10,515 +13,162 @@ import { Badge, Clipboard, Eye, RefreshCw, Server, Sparkles } from '@lucide/astr
     <meta name="description" content="Build Shields.io badges for Minecraft Bedrock servers." />
     <title>mcpe-shield Badge Builder</title>
     <style>
-      :root {
-        color-scheme: light;
-        font-family:
-          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        background: #f7f7f4;
-        color: #141414;
-      }
-
-      * {
-        box-sizing: border-box;
-      }
-
-      body {
-        margin: 0;
-        min-height: 100vh;
-        background:
-          linear-gradient(135deg, rgba(45, 125, 90, 0.09), transparent 34%),
-          linear-gradient(315deg, rgba(26, 86, 155, 0.08), transparent 38%),
-          #f7f7f4;
-      }
-
-      a {
-        color: inherit;
-        text-decoration: none;
-      }
-
-      .shell {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) minmax(320px, 420px);
-        gap: 24px;
-        width: min(1120px, calc(100% - 32px));
-        min-height: 100vh;
-        margin: 0 auto;
-        padding: 24px 0;
-      }
-
-      .main-column,
-      .side-column,
-      .builder {
-        display: flex;
-        min-width: 0;
-        flex-direction: column;
-        gap: 16px;
-      }
-
-      .side-column {
-        position: sticky;
-        top: 24px;
-        align-self: start;
-      }
-
-      .topbar {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 16px;
-        border-bottom: 1px solid #deded7;
-        padding-bottom: 16px;
-      }
-
-      .brand,
-      h1,
-      .panel-head,
-      .preview-head,
-      label span {
-        display: flex;
-        align-items: center;
-      }
-
-      .brand {
-        min-width: 0;
-        gap: 12px;
-      }
-
-      h1 {
-        margin: 0;
-        gap: 8px;
-        font-size: 1.55rem;
-        line-height: 1.1;
-        letter-spacing: 0;
-      }
-
-      h1 svg,
-      h2 svg,
-      label svg {
-        color: #16805b;
-        flex: none;
-      }
-
-      p {
-        margin: 0;
-      }
-
-      .brand p,
-      .hint {
-        color: #66685f;
-        font-size: 0.92rem;
-      }
-
-      .panel {
-        border: 1px solid #deded7;
-        border-radius: 8px;
-        background: rgba(255, 255, 255, 0.92);
-        box-shadow: 0 12px 32px rgba(30, 38, 32, 0.08);
-        padding: 16px;
-      }
-
-      .form-grid {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 16px;
-      }
-
-      label {
-        display: grid;
-        min-width: 0;
-        gap: 8px;
-      }
-
-      label span {
-        gap: 8px;
-        color: #2f332e;
-        font-size: 0.9rem;
-        font-weight: 800;
-      }
-
-      input,
-      select {
-        width: 100%;
-        min-width: 0;
-        height: 42px;
-        border: 1px solid #caccc2;
-        border-radius: 7px;
-        background: #ffffff;
-        color: #171914;
-        font: inherit;
-        padding: 0 12px;
-      }
-
-      input:focus,
-      select:focus,
-      button:focus-visible,
-      a:focus-visible {
-        outline: 3px solid rgba(22, 128, 91, 0.22);
-        outline-offset: 2px;
-      }
-
-      .button {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        min-height: 38px;
-        border: 1px solid #cfd1c8;
-        border-radius: 7px;
-        cursor: pointer;
-        font: inherit;
-        font-weight: 850;
-        line-height: 1;
-        padding: 0 14px;
-        white-space: nowrap;
-      }
-
-      .button.ghost {
-        background: #ffffff;
-        color: #20231f;
-      }
-
-      .button.dark {
-        background: #171914;
-        border-color: #171914;
-        color: #ffffff;
-      }
-
-      .button.primary {
-        background: #16805b;
-        border-color: #126a4b;
-        color: #ffffff;
-      }
-
-      .icon-button {
-        width: 42px;
-        padding: 0;
-      }
-
-      .button:hover {
-        filter: brightness(0.96);
-      }
-
-      .panel-head,
-      .preview-head {
-        justify-content: space-between;
-        gap: 12px;
-        margin-bottom: 12px;
-      }
-
-      h2,
-      .plain-heading {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        margin: 0;
-        font-size: 1rem;
-        line-height: 1.2;
-        letter-spacing: 0;
-      }
-
-      .preview-head h2 {
-        font-size: 1.15rem;
-      }
-
-      .code-output {
-        display: block;
-        min-height: 48px;
-        overflow-wrap: anywhere;
-        border: 1px solid #deded7;
-        border-radius: 7px;
-        background: #f4f5f0;
-        color: #2e332d;
-        font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
-        font-size: 0.86rem;
-        line-height: 1.55;
-        padding: 12px;
-      }
-
-      .output-stack {
-        display: grid;
-        gap: 10px;
-      }
-
-      .output-row {
-        display: grid;
-        gap: 6px;
-      }
-
-      .output-row-head {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 10px;
-      }
-
-      .output-label {
-        color: #55584f;
-        font-size: 0.78rem;
-        font-weight: 850;
-        letter-spacing: 0;
-        text-transform: uppercase;
-      }
-
-      .copy-mini {
-        min-height: 30px;
-        padding: 0 10px;
-        font-size: 0.82rem;
-      }
-
-      .preview-box {
-        display: flex;
-        position: relative;
-        align-items: center;
-        justify-content: center;
-        min-height: 112px;
-        border: 1px dashed #bfc2b7;
-        border-radius: 8px;
-        background: #f4f5f0;
-        padding: 16px;
-      }
-
-      .preview-box img {
-        max-width: 100%;
-        height: auto;
-      }
-
       .preview-box.loading img {
         opacity: 0;
       }
 
-      .preview-box.loading::after {
-        content: "Loading preview...";
-        position: absolute;
-        color: #55584f;
-        font-size: 0.9rem;
-        font-weight: 800;
-      }
-
-      .preview-box.error::after {
-        content: "Preview failed.";
-        color: #9f1d1d;
-        font-size: 0.9rem;
-        font-weight: 800;
-      }
-
-      .hint {
-        margin-top: 12px;
-        line-height: 1.5;
-      }
-
-      .chips {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 8px;
-        margin-top: 12px;
-      }
-
-      code {
-        min-width: 0;
-        overflow-wrap: anywhere;
-        border-radius: 6px;
-        background: #eef0e9;
-        color: #252923;
-        font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
-        font-size: 0.88rem;
-        padding: 7px 8px;
-      }
-
-      .toast {
-        position: fixed;
-        right: 16px;
-        bottom: 16px;
-        border-radius: 7px;
-        background: #171914;
-        color: #ffffff;
-        font-weight: 800;
-        padding: 12px 14px;
-        box-shadow: 0 12px 32px rgba(20, 20, 20, 0.2);
-      }
-
-      .hidden {
-        display: none;
-      }
-
-      @media (max-width: 860px) {
-        .shell {
-          grid-template-columns: 1fr;
-          width: min(100% - 24px, 680px);
-          padding: 16px 0;
-        }
-
-        .side-column {
-          position: static;
-        }
-      }
-
-      @media (max-width: 560px) {
-        .form-grid,
-        .chips {
-          grid-template-columns: 1fr;
-        }
-
-        .topbar,
-        .panel-head,
-        .preview-head {
-          align-items: flex-start;
-          flex-direction: column;
-        }
-
-        .button {
-          width: 100%;
-        }
-
-        .icon-button {
-          width: 42px;
-        }
+      .preview-box.loading [data-preview-status],
+      .preview-box.error [data-preview-status] {
+        display: block;
       }
     </style>
   </head>
-  <body>
-    <main class="shell">
-      <section class="main-column">
-        <header class="topbar">
-          <div class="brand">
+  <body class="min-h-screen bg-base-200 text-base-content">
+    <main class="mx-auto grid min-h-screen w-[min(1200px,calc(100%-2rem))] grid-cols-1 gap-4 py-4 lg:grid-cols-[minmax(0,1fr)_minmax(360px,430px)]">
+      <section class="flex min-w-0 flex-col gap-4">
+        <header class="flex items-center justify-between gap-4 border-b border-base-300 pb-4 max-sm:flex-col max-sm:items-start">
+          <div class="flex min-w-0 items-center gap-4">
             <img src="https://static.cosmicpe.me/logo.svg" alt="CosmicPE" width="36" height="36" />
-            <div>
-              <h1>
-                mcpe-shield
-              </h1>
-              <p>Build shields.io badges for Minecraft Bedrock servers.</p>
+            <div class="min-w-0">
+              <h1 class="text-2xl font-black leading-tight">mcpe-shield</h1>
+              <p class="text-base text-base-content/65">Build shields.io badges for Minecraft Bedrock servers.</p>
             </div>
           </div>
-          <a class="button ghost" href="https://github.com/Cosmoverse/mcpe-shield">
+          <a class="btn btn-outline" href="https://github.com/Cosmoverse/mcpe-shield">
             GitHub
           </a>
         </header>
 
-        <form class="builder" data-builder>
-          <div class="panel form-grid">
-            <label>
-              <span><Server size={16} /> Server host</span>
-              <input name="host" value="cannon.cosmicpe.me" placeholder="play.example.net" autocomplete="off" />
-            </label>
+        <form class="grid gap-4" data-builder>
+          <div class="card border border-base-300 bg-base-100 shadow-sm">
+            <div class="card-body grid grid-cols-1 gap-4 p-4 sm:grid-cols-2">
+              <label class="form-control gap-1.5">
+                <span class="label p-0 text-sm font-extrabold"><Server size={15} /> Server host</span>
+                <input class="input input-bordered w-full" name="host" value="cannon.cosmicpe.me" placeholder="play.example.net" autocomplete="off" />
+              </label>
 
-            <label>
-              <span>Port</span>
-              <input name="port" value="19132" inputmode="numeric" placeholder="19132" />
-            </label>
+              <label class="form-control gap-1.5">
+                <span class="label p-0 text-sm font-extrabold">Port</span>
+                <input class="input input-bordered w-full" name="port" value="19132" inputmode="numeric" placeholder="19132" />
+              </label>
 
-            <label>
-              <span>Colour</span>
-              <select name="colour">
-                <option value="">brightgreen</option>
-                <option>blue</option>
-                <option>green</option>
-                <option>yellow</option>
-                <option>orange</option>
-                <option>red</option>
-                <option>success</option>
-                <option>informational</option>
-              </select>
-            </label>
+              <label class="form-control gap-1.5">
+                <span class="label p-0 text-sm font-extrabold">Colour</span>
+                <select class="select select-bordered w-full" name="colour">
+                  <option value="">brightgreen</option>
+                  <option>blue</option>
+                  <option>green</option>
+                  <option>yellow</option>
+                  <option>orange</option>
+                  <option>red</option>
+                  <option>success</option>
+                  <option>informational</option>
+                </select>
+              </label>
 
-            <label>
-              <span>Custom hex</span>
-              <input name="hex" placeholder="44cc88" autocomplete="off" />
-            </label>
+              <label class="form-control gap-1.5">
+                <span class="label p-0 text-sm font-extrabold">Custom hex</span>
+                <input class="input input-bordered w-full" name="hex" placeholder="44cc88" autocomplete="off" />
+              </label>
 
-            <label>
-              <span>Label</span>
-              <input name="label" value="'motd'" autocomplete="off" />
-            </label>
+              <label class="form-control gap-1.5">
+                <span class="label p-0 text-sm font-extrabold">Label</span>
+                <input class="input input-bordered w-full" name="label" value="'motd'" autocomplete="off" />
+              </label>
 
-            <label>
-              <span>Message</span>
-              <input name="message" value="v'version' ('players'/'maxPlayers')" autocomplete="off" />
-            </label>
+              <label class="form-control gap-1.5">
+                <span class="label p-0 text-sm font-extrabold">Message</span>
+                <input class="input input-bordered w-full" name="message" value="v'version' ('players'/'maxPlayers')" autocomplete="off" />
+              </label>
 
-            <label>
-              <span>Offline label</span>
-              <input name="offlineLabel" value="Server" autocomplete="off" />
-            </label>
+              <label class="form-control gap-1.5">
+                <span class="label p-0 text-sm font-extrabold">Offline label</span>
+                <input class="input input-bordered w-full" name="offlineLabel" value="Server" autocomplete="off" />
+              </label>
 
-            <label>
-              <span>Offline message</span>
-              <input name="offlineMessage" value="offline" autocomplete="off" />
-            </label>
+              <label class="form-control gap-1.5">
+                <span class="label p-0 text-sm font-extrabold">Offline message</span>
+                <input class="input input-bordered w-full" name="offlineMessage" value="offline" autocomplete="off" />
+              </label>
+            </div>
           </div>
         </form>
 
-        <section class="panel">
-          <div class="preview-head">
-            <h2><Eye size={20} /> Preview</h2>
-            <button class="button primary icon-button" type="button" data-preview aria-label="Refresh preview" title="Refresh preview">
-              <RefreshCw size={18} />
-            </button>
+        <section class="card border border-base-300 bg-base-100 shadow-sm">
+          <div class="card-body gap-3 p-4">
+            <div class="flex items-center justify-between gap-3">
+              <h2 class="flex items-center gap-2 text-lg font-black"><Eye size={20} /> Preview</h2>
+              <button class="btn btn-primary btn-square" type="button" data-preview aria-label="Refresh preview" title="Refresh preview">
+                <RefreshCw size={18} />
+              </button>
+            </div>
+            <div class="preview-box relative flex min-h-24 items-center justify-center rounded-box border border-dashed border-base-300 bg-base-200 p-4" data-preview-box>
+              <img class="max-w-full" data-preview-image alt="Badge preview" />
+              <span class="hidden text-sm font-bold text-base-content/65" data-preview-status>Loading preview...</span>
+            </div>
+            <p class="text-base leading-snug text-base-content/65">URL updates as you type. Badge image only refreshes when you click Preview, because manners.</p>
           </div>
-          <div class="preview-box" data-preview-box>
-            <img data-preview-image alt="Badge preview" />
-          </div>
-          <p class="hint">URL updates as you type. Badge image only refreshes when you click Preview, because manners.</p>
         </section>
       </section>
 
-      <aside class="side-column">
-        <section class="panel">
-          <h2 class="plain-heading">Placeholders</h2>
-          <div class="chips">
-            <code>'edition'</code>
-            <code>'motd'</code>
-            <code>'protocol'</code>
-            <code>'version'</code>
-            <code>'players'</code>
-            <code>'maxPlayers'</code>
-            <code>'serverId'</code>
-            <code>'subMotd'</code>
-            <code>'gamemode'</code>
-            <code>'gamemodeId'</code>
-            <code>'portIpv4'</code>
-            <code>'portIpv6'</code>
+      <aside class="flex min-w-0 flex-col gap-4 lg:sticky lg:top-4 lg:self-start">
+        <section class="card border border-base-300 bg-base-100 shadow-sm">
+          <div class="card-body gap-3 p-4">
+            <h2 class="text-base font-black">Placeholders</h2>
+            <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+              {placeholders.map((key) => (
+                <button class="btn h-auto min-h-0 justify-start bg-base-200 px-3 py-2 text-left" type="button" data-placeholder={key}>
+                  <span class="grid min-w-0 gap-1">
+                    <strong class="min-w-0 break-words font-mono text-sm font-black">'{key}'</strong>
+                    <span class="min-w-0 break-words text-xs font-normal leading-snug text-base-content/60" data-placeholder-value={key}>-</span>
+                  </span>
+                </button>
+              ))}
+            </div>
           </div>
         </section>
 
-        <section class="panel">
-          <div class="panel-head">
-            <h2><Sparkles size={18} /> Markdown & URLs</h2>
-          </div>
-          <div class="output-stack">
-            <div class="output-row">
-              <div class="output-row-head">
-                <span class="output-label">Markdown</span>
-                <button class="button dark copy-mini" type="button" data-copy-md>
-                  <Clipboard size={14} /> Copy
-                </button>
+        <section class="card border border-base-300 bg-base-100 shadow-sm">
+          <div class="card-body min-w-0 gap-3 p-4">
+            <h2 class="text-lg font-black">Markdown & URLs</h2>
+            <div class="grid min-w-0 gap-3">
+              <div class="grid min-w-0 gap-1.5">
+                <div class="flex min-w-0 items-center justify-between gap-2">
+                  <span class="min-w-0 text-sm font-extrabold uppercase text-base-content/65">Markdown</span>
+                  <button class="btn btn-neutral btn-sm" type="button" data-copy-md>
+                    <Clipboard size={14} /> Copy
+                  </button>
+                </div>
+                <output class="block min-h-12 min-w-0 max-w-full whitespace-pre-wrap break-all rounded-box border border-base-300 bg-base-200 p-3 font-mono text-sm leading-snug" data-markdown></output>
               </div>
-              <output class="code-output" data-markdown></output>
-            </div>
-            <div class="output-row">
-              <div class="output-row-head">
-                <span class="output-label">Shields.io URL</span>
-                <button class="button dark copy-mini" type="button" data-copy-shields-url>
-                  <Clipboard size={14} /> Copy
-                </button>
+
+              <div class="grid min-w-0 gap-1.5">
+                <div class="flex min-w-0 items-center justify-between gap-2">
+                  <span class="min-w-0 text-sm font-extrabold uppercase text-base-content/65">Shields.io URL</span>
+                  <button class="btn btn-neutral btn-sm" type="button" data-copy-shields-url>
+                    <Clipboard size={14} /> Copy
+                  </button>
+                </div>
+                <output class="block min-h-12 min-w-0 max-w-full whitespace-pre-wrap break-all rounded-box border border-base-300 bg-base-200 p-3 font-mono text-sm leading-snug" data-shields-url></output>
               </div>
-              <output class="code-output" data-shields-url></output>
-            </div>
-            <div class="output-row">
-              <div class="output-row-head">
-                <span class="output-label">Endpoint URL</span>
-                <button class="button dark copy-mini" type="button" data-copy-raw-url>
-                  <Clipboard size={14} /> Copy
-                </button>
+
+              <div class="grid min-w-0 gap-1.5">
+                <div class="flex min-w-0 items-center justify-between gap-2">
+                  <span class="min-w-0 text-sm font-extrabold uppercase text-base-content/65">Endpoint URL</span>
+                  <button class="btn btn-neutral btn-sm" type="button" data-copy-raw-url>
+                    <Clipboard size={14} /> Copy
+                  </button>
+                </div>
+                <output class="block min-h-12 min-w-0 max-w-full whitespace-pre-wrap break-all rounded-box border border-base-300 bg-base-200 p-3 font-mono text-sm leading-snug" data-raw-url></output>
               </div>
-              <output class="code-output" data-raw-url></output>
             </div>
           </div>
         </section>
       </aside>
     </main>
 
-    <div class="toast hidden" data-toast>
-      Copied.
+    <div class="toast toast-end hidden" data-toast>
+      <div class="alert alert-neutral py-2 text-sm font-bold">Copied.</div>
     </div>
 
     <script>
@@ -527,11 +177,14 @@ import { Badge, Clipboard, Eye, RefreshCw, Server, Sparkles } from '@lucide/astr
       const shieldsUrlOutput = document.querySelector('[data-shields-url]') as HTMLOutputElement;
       const rawUrlOutput = document.querySelector('[data-raw-url]') as HTMLOutputElement;
       const previewBox = document.querySelector('[data-preview-box]') as HTMLDivElement;
+      const previewStatus = document.querySelector('[data-preview-status]') as HTMLSpanElement;
       const previewImage = document.querySelector('[data-preview-image]') as HTMLImageElement;
       const previewButton = document.querySelector('[data-preview]') as HTMLButtonElement;
       const copyMarkdownButton = document.querySelector('[data-copy-md]') as HTMLButtonElement;
       const copyShieldsUrlButton = document.querySelector('[data-copy-shields-url]') as HTMLButtonElement;
       const copyRawUrlButton = document.querySelector('[data-copy-raw-url]') as HTMLButtonElement;
+      const placeholderButtons = document.querySelectorAll('[data-placeholder]') as NodeListOf<HTMLButtonElement>;
+      const placeholderValues = document.querySelectorAll('[data-placeholder-value]') as NodeListOf<HTMLSpanElement>;
       const toast = document.querySelector('[data-toast]') as HTMLDivElement;
 
       const endpointBase = 'https://badge.cosmicpe.dev';
@@ -564,7 +217,8 @@ import { Badge, Clipboard, Eye, RefreshCw, Server, Sparkles } from '@lucide/astr
         }
         const rawUrl = `${endpointBase}/${parts.join('-')}`;
         const shieldsUrl = `${shieldsBase}${encodeURIComponent(rawUrl)}`;
-        return { rawUrl, shieldsUrl };
+        const pingUrl = `${endpointBase}/ping/${encodeURIComponent(target)}`;
+        return { rawUrl, shieldsUrl, pingUrl };
       }
 
       function updateOutputs() {
@@ -584,22 +238,38 @@ import { Badge, Clipboard, Eye, RefreshCw, Server, Sparkles } from '@lucide/astr
         showToast();
       }
 
+      async function updatePlaceholderValues() {
+        const response = await fetch(getBadgeUrls().pingUrl);
+        if (!response.ok) return;
+        const data = await response.json();
+        placeholderValues.forEach((value) => {
+          const key = value.dataset.placeholderValue || '';
+          value.textContent = String(data[key] ?? '-');
+        });
+      }
+
       form.addEventListener('input', updateOutputs);
       previewButton.addEventListener('click', () => {
         previewBox.classList.remove('error');
         previewBox.classList.add('loading');
+        previewStatus.textContent = 'Loading preview...';
         previewImage.src = getBadgeUrls().shieldsUrl;
       });
       previewImage.addEventListener('load', () => {
         previewBox.classList.remove('loading', 'error');
+        updatePlaceholderValues();
       });
       previewImage.addEventListener('error', () => {
         previewBox.classList.remove('loading');
         previewBox.classList.add('error');
+        previewStatus.textContent = 'Preview failed.';
       });
       copyMarkdownButton.addEventListener('click', () => copyText(markdownOutput.textContent || ''));
       copyShieldsUrlButton.addEventListener('click', () => copyText(shieldsUrlOutput.textContent || ''));
       copyRawUrlButton.addEventListener('click', () => copyText(rawUrlOutput.textContent || ''));
+      placeholderButtons.forEach((button) => {
+        button.addEventListener('click', () => copyText(`'${button.dataset.placeholder || ''}'`));
+      });
 
       updateOutputs();
       previewImage.src = getBadgeUrls().shieldsUrl;
