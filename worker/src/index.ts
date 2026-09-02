@@ -38,9 +38,9 @@ export default {
 		const url = new URL(request.url)
 		if(url.pathname.startsWith("/ping")){
 			try{
-				return Response.json(await query(decodeURIComponent(url.pathname.slice(6))))
+				return Response.json(await query(decodeURIComponent(url.pathname.slice(6))), { headers: {"Access-Control-Allow-Origin": "*"} })
 			}catch{
-				return new Response("Service Unavailable", { status: 503 })
+				return new Response("Service Unavailable", { status: 503, headers: {"Access-Control-Allow-Origin": "*"} })
 			}
 		}
 
