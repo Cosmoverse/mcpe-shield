@@ -13,7 +13,7 @@ async function query(url: string){
 	})
 	if(!response.ok) throw Error("Failed to fetch")
 	const data = await response.bytes()
-	const p = new TextDecoder().decode(data.slice(60)).split(";")
+	const p = new TextDecoder().decode(data.slice(61)).split(";")
 	return {
 		edition: p[0],
 		motd: p[1].replace(/§[0-9a-fk-or]/gi, ""),
